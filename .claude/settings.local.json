@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "mcp__stitch__create_project",
-      "mcp__stitch__generate_screen_from_text"
-    ]
-  }
-}
