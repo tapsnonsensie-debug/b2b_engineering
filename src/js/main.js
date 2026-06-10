@@ -3,7 +3,14 @@ const METRIKA_ID = import.meta.env.VITE_METRIKA_ID || '';
 const COOKIE_KEY = 'tp_cookie_consent';
 
 /* ─── Analytics ─── */
+let cookieConsent = null; // {technical, analytics, advertising, timestamp, version}
+
+function analyticsAllowed() {
+  return !!(cookieConsent && cookieConsent.analytics);
+}
+
 function trackEvent(name, params = {}) {
+  if (!analyticsAllowed()) return; // не трекаем без согласия на аналитику
   if (METRIKA_ID && typeof ym === 'function') {
     ym(METRIKA_ID, 'reachGoal', name, params);
   }
@@ -286,22 +293,103 @@ function initForms() {
   document.querySelectorAll('.form').forEach(handleForm);
 }
 
-/* ─── Cookie banner ─── */
+/* ─── Cookie banner (две панели + категории) ─── */
+const CONSENT_VERSION = '1.0';
+
+function getStoredConsent() {
+  try {
+    const data = JSON.parse(localStorage.getItem(COOKIE_KEY));
+    // принимаем только валидный объект текущей версии
+    if (data && typeof data === 'object' && data.version === CONSENT_VERSION) return data;
+  } catch { /* устаревший формат — переспросим */ }
+  return null;
+}
+
+function applyConsent(consent) {
+  cookieConsent = consent;
+  // Аналитику и рекламу подключать ТОЛЬКО при согласии (реальный init добавляет заказчик)
+  if (consent.analytics) {
+    // window.ym && ym(METRIKA_ID, 'init', {...})
+    // window.gtag && gtag('config', GA4_ID)
+  }
+  if (consent.advertising) {
+    // загрузка ретаргетинга
+  }
+}
+
+function saveConsent({ analytics = false, advertising = false }) {
+  const data = {
+    technical: true,
+    analytics,
+    advertising,
+    timestamp: new Date().toISOString(),
+    version: CONSENT_VERSION
+  };
+  localStorage.setItem(COOKIE_KEY, JSON.stringify(data));
+  applyConsent(data);
+}
+
 function initCookieBanner() {
-  if (localStorage.getItem(COOKIE_KEY)) return;
   const banner = document.getElementById('cookie-banner');
-  if (!banner) return;
+  const settings = document.getElementById('cookie-settings');
+  if (!banner || !settings) return;
 
-  requestAnimationFrame(() => banner.classList.add('is-visible'));
+  const stored = getStoredConsent();
+  if (stored) { applyConsent(stored); return; } // согласие уже есть — не показываем
 
-  banner.querySelector('#cookie-accept')?.addEventListener('click', () => {
-    localStorage.setItem(COOKIE_KEY, '1');
-    banner.classList.remove('is-visible');
-  });
+  function show(el) {
+    el.hidden = false;
+    requestAnimationFrame(() => el.classList.add('is-visible'));
+  }
+  function hide(el) {
+    el.classList.remove('is-visible');
+    const onEnd = (e) => {
+      if (e.target !== el) return; // игнорируем всплытие с дочерних (переключатели)
+      el.hidden = true;
+      el.removeEventListener('transitionend', onEnd);
+    };
+    el.addEventListener('transitionend', onEnd);
+  }
 
-  banner.querySelector('#cookie-decline')?.addEventListener('click', () => {
-    localStorage.setItem(COOKIE_KEY, '0');
-    banner.classList.remove('is-visible');
+  show(banner);
+
+  // Делегирование действий по data-cookie-action
+  function onAction(e) {
+    const action = e.target.closest('[data-cookie-action]')?.dataset.cookieAction;
+    if (!action) return;
+    switch (action) {
+      case 'accept-all':
+        saveConsent({ analytics: true, advertising: true });
+        hide(banner);
+        break;
+      case 'open-settings':
+        hide(banner);
+        show(settings);
+        break;
+      case 'back':
+        hide(settings);
+        show(banner);
+        break;
+      case 'save-settings': {
+        const analytics = settings.querySelector('[data-category="analytics"]').checked;
+        const advertising = settings.querySelector('[data-category="advertising"]').checked;
+        saveConsent({ analytics, advertising });
+        hide(settings);
+        break;
+      }
+    }
+  }
+  banner.addEventListener('click', onAction);
+  settings.addEventListener('click', onAction);
+
+  // Раскрытие описаний категорий
+  settings.querySelectorAll('.cookie-category__toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const desc = btn.closest('.cookie-category')?.querySelector('.cookie-category__desc');
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      if (desc) desc.hidden = expanded;
+    });
   });
 }
 
