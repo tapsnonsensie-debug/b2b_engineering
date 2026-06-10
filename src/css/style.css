@@ -757,7 +757,7 @@ img.img-real.img-ph--square { aspect-ratio: 1; max-width: 100%; }
 .cert-lightbox.is-active .cert-lightbox__inner {
   transform: scale(1);
 }
-.cert-lightbox__inner svg {
+.cert-lightbox__media svg {
   display: block;
   width: min(600px, 90vw);
   height: auto;
@@ -1023,42 +1023,53 @@ img.img-real.img-ph--square { aspect-ratio: 1; max-width: 100%; }
 /* ═══════════════════════════════════════════
    COOKIE BANNER
 ═══════════════════════════════════════════ */
-/* Общая карточка для обоих экранов cookie */
+/* Полноширинная нижняя панель для обоих экранов cookie */
 .cookie-banner,
 .cookie-settings {
   position: fixed;
-  bottom: 16px;
-  left: 16px;
-  right: 16px;
-  max-width: 560px;
-  margin-inline: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1200; /* выше попапов (1100) и меню (1000) */
   background: var(--color-graphite);
   color: rgba(255,255,255,.85);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-5);
+  border-top: 1px solid rgba(255,255,255,.12);
+  padding: var(--sp-5) var(--container-padding);
   padding-bottom: calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
-  box-shadow: var(--shadow-lg);
-  transform: translateY(16px);
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.25);
+  transform: translateY(100%);
+  transition: transform 0.35s ease;
 }
 .cookie-banner.is-visible,
-.cookie-settings.is-visible { transform: translateY(0); opacity: 1; }
+.cookie-settings.is-visible { transform: translateY(0); }
 .cookie-banner[hidden],
 .cookie-settings[hidden] { display: none; }
+
+/* Контент по ширине контейнера сайта */
+.cookie-banner__inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-4) var(--sp-6);
+}
+.cookie-banner__copy { flex: 1; min-width: 260px; }
+.cookie-settings__inner {
+  max-width: 760px;
+  margin-inline: auto;
+}
 
 .cookie-banner__title {
   font-size: 16px;
   font-weight: 700;
   color: var(--color-text-inverse);
-  margin-bottom: var(--sp-2);
+  margin-bottom: var(--sp-1);
 }
-.cookie-banner__text { font-size: 14px; color: rgba(255,255,255,.7); margin-bottom: var(--sp-4); max-width: none; }
+.cookie-banner__text { font-size: 14px; color: rgba(255,255,255,.7); margin-bottom: 0; max-width: 70ch; }
 .cookie-banner a,
 .cookie-settings a { color: var(--color-accent); text-decoration: underline; }
-.cookie-banner__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+.cookie-banner__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); flex-shrink: 0; }
 
 /* Кнопки cookie */
 .cookie-btn {

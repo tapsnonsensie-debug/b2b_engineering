@@ -868,11 +868,13 @@
 <!-- Экран 1: основной баннер -->
 <div class="cookie-banner" id="cookie-banner" role="dialog" aria-labelledby="cookie-title" aria-modal="false" hidden>
   <div class="cookie-banner__inner">
-    <h3 id="cookie-title" class="cookie-banner__title">Мы используем файлы cookie для улучшения работы сайта</h3>
-    <p class="cookie-banner__text">
-      Подробнее — в <a href="/legal/cookies.html" target="_blank" rel="noopener">политике cookie</a>.
-      Вы можете принять все cookie или настроить категории.
-    </p>
+    <div class="cookie-banner__copy">
+      <h3 id="cookie-title" class="cookie-banner__title">Мы используем файлы cookie для улучшения работы сайта</h3>
+      <p class="cookie-banner__text">
+        Подробнее — в <a href="/legal/cookies.html" target="_blank" rel="noopener">политике cookie</a>.
+        Вы можете принять все cookie или настроить категории.
+      </p>
+    </div>
     <div class="cookie-banner__actions">
       <button class="cookie-btn cookie-btn--primary" data-cookie-action="accept-all">Принять все</button>
       <button class="cookie-btn cookie-btn--ghost" data-cookie-action="open-settings">Настройки cookie</button>
@@ -945,6 +947,7 @@
     <button class="cert-lightbox__close" id="cert-lightbox-close" aria-label="Закрыть">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
+    <div class="cert-lightbox__media" id="cert-lightbox-media"></div>
   </div>
 </div>
 

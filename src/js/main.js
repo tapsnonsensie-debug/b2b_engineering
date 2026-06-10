@@ -476,9 +476,9 @@ function initScrollAnimations() {
 /* ─── Cert lightbox ─── */
 function initCertLightbox() {
   const lb = document.getElementById('cert-lightbox');
-  const inner = lb?.querySelector('.cert-lightbox__inner');
+  const media = document.getElementById('cert-lightbox-media');
   const closeBtn = document.getElementById('cert-lightbox-close');
-  if (!lb || !inner || !closeBtn) return;
+  if (!lb || !media || !closeBtn) return;
 
   let lastFocused = null;
 
@@ -486,9 +486,8 @@ function initCertLightbox() {
     const svg = card.querySelector('svg');
     if (!svg) return;
     const clone = svg.cloneNode(true);
-    // remove any stale clone from previous open
-    inner.querySelectorAll('svg').forEach(s => s.remove());
-    inner.appendChild(clone);
+    // заменяем только содержимое медиа-контейнера, кнопку закрытия не трогаем
+    media.replaceChildren(clone);
     lastFocused = document.activeElement;
     lb.classList.add('is-active');
     lb.removeAttribute('aria-hidden');
